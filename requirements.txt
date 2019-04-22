@@ -3,3 +3,4 @@ beautifulsoup4
 flask
 pandas
 selenium
+flask_cors

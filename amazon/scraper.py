@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 
 import re
-from xbot.product import Product
 from scraper.selenium_web_driver import SeleniumChromeDriver
 from selenium.common.exceptions import NoSuchElementException
 
@@ -130,15 +129,18 @@ class AmazonScraper:
     def has_old_price(self):
         return self.old_price is not None
 
-    def to_product(self):
-        return Product(short_description=self.title,
-                       description=self.description,
-                       features=self.features,
-                       standard_price=self.old_price,
-                       end_date=self.end_date,
-                       price=self.price,
-                       url=self.url,
-                       image_url=self.image_url,
-                       size=self.size)
+    def to_dict(self):
+        response = {
+                'short_description': self.title,
+                'description': self.description,
+                'features': self.features,
+                'standard_price': self.old_price,
+                'end_date': self.end_date,
+                'price': self.price,
+                'url': self.url,
+                'image_url': self.image_url,
+                'size': self.size
+             }
+        return response
 
 
