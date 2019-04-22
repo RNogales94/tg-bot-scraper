@@ -7,6 +7,7 @@ import json
 xbot_webservice = Flask(__name__)
 CORS(xbot_webservice)
 
+
 def is_valid_url(url):
     return True
 
