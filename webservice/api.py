@@ -13,9 +13,12 @@ def is_valid_url(url):
 
 
 @xbot_webservice.route("/")
+def index():
+    return 'xbot01'
+
+@xbot_webservice.route("/ping")
 def ping():
     return Response(json.dump({'Message': 'Scraper instance'}), status=200, mimetype='application/json')
-
 
 @xbot_webservice.route("/dev/myip")
 def myip():
