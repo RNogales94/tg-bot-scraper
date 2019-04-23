@@ -33,7 +33,7 @@ class AmazonScraper:
         self.soup = BeautifulSoup(source_html, "html.parser")
 
         # Scrape properties
-        print(self.soup)
+        #print(self.soup)
 
         if self.soup.title.text == 'Amazon CAPTCHA':
             self.is_captcha = True
