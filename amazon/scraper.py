@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import re
 from scraper.selenium_web_driver import SeleniumChromeDriver
 from selenium.common.exceptions import NoSuchElementException
+from amazon.tools import expand_url
 
 
 def captureURLs(text):
@@ -13,6 +14,7 @@ def captureURLs(text):
 class AmazonScraper:
     def __init__(self, url):
         print(f'Scrapeando {url}')
+        url = expand_url(url)
 
         self.fully_scraped = True
         self.url = url
