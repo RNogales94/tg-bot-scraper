@@ -1,5 +1,6 @@
 from flask import Flask, Response, request
 from amazon.scraper import AmazonScraper
+from amazon.tools import expand_url
 from flask_cors import CORS
 from urllib.parse import urlparse
 
@@ -29,11 +30,15 @@ def myip():
 @xbot_webservice.route("/api/scrape")
 def scrape():
     url = request.args.get('url') or ''
-    print(url)
 
+    print(url)
     if url == '':
         print('Parameter url not found: 400 Error')
         return Response(json.dumps({'Error': 'Parameter url not found'}), status=400, mimetype='application/json')
+
+    url = expand_url(url)
+    print(f'Expanded: {url}')
+
     if is_valid_url(url):
         try:
             data = AmazonScraper(url).to_dict()
