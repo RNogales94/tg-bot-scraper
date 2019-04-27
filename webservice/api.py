@@ -31,17 +31,21 @@ def scrape():
     print(url)
 
     if url == '':
+        print('Parameter url not found: 400 Error')
         return Response(json.dumps({'Error': 'Parameter url not found'}), status=400, mimetype='application/json')
     if is_valid_url(url):
         try:
             data = AmazonScraper(url).to_dict()
             response = json.dumps(data)
+            print(response)
             status = 200
         except:
             response = json.dumps({'Error': f'Cannot scrape this valid url {url} (probably due to a CAPTCHA)'})
+            print(response)
             status = 409
     else:
         response = json.dumps({'Error': f'{url} is not valid product URL'})
+        print(response)
         status = 412
 
     return Response(response, status=status, mimetype='application/json')
