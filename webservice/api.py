@@ -18,9 +18,11 @@ def is_valid_url(url):
 def index():
     return 'xbot01'
 
+
 @xbot_webservice.route("/ping")
 def ping():
     return Response(json.dump({'Message': 'Scraper instance'}), status=200, mimetype='application/json')
+
 
 @xbot_webservice.route("/dev/myip")
 def myip():
@@ -50,7 +52,7 @@ def scrape():
             print(response)
             status = 409
     else:
-        response = json.dumps({'Error': f'{url} is not valid product URL'})
+        response = json.dumps({'Error': f'{url} is not valid Amazon product URL'})
         print(response)
         status = 412
 
