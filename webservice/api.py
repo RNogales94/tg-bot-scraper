@@ -29,9 +29,9 @@ def myip():
     return request.remote_addr
 
 
-@xbot_webservice.route("/api/scrape")
+@xbot_webservice.route("/api/scrape", methods=['POST'])
 def scrape():
-    url = request.args.get('url') or ''
+    url = request.json.get('url')
 
     print(url)
     if url == '':
