@@ -1,6 +1,7 @@
 from flask import Flask, Response, request
 from amazon.scraper import AmazonScraper
 from flask_cors import CORS
+from urllib.parse import urlparse
 
 import json
 
@@ -9,7 +10,7 @@ CORS(xbot_webservice)
 
 
 def is_valid_url(url):
-    return True
+    return 'amazon' in urlparse(url).netloc.split('.')
 
 
 @xbot_webservice.route("/")
