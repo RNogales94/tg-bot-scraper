@@ -31,6 +31,9 @@ def myip():
 
 @xbot_webservice.route("/api/scrape", methods=['POST'])
 def scrape():
+
+    print('-------------------------------------------------')
+    print("Scraping")
     url = request.json.get('url')
 
     print(url)
@@ -56,6 +59,7 @@ def scrape():
         print(response)
         status = 412
 
+    print('*************************************************')
     return Response(response, status=status, mimetype='application/json')
 
 
