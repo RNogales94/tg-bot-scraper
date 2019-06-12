@@ -1,10 +1,12 @@
 import requests
 import re
 
+
 def expand_url(url):
     session = requests.Session()  # so connections are recycled
     resp = session.head(url, allow_redirects=True)
     return resp.url
+
 
 def is_amazon(url):
     url_pattern = re.compile(
@@ -13,6 +15,7 @@ def is_amazon(url):
         return True
     else:
         return False
+
 
 def is_aliexpress(url):
     url_pattern = re.compile(
