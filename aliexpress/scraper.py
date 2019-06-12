@@ -120,10 +120,14 @@ class AliexpressScraper:
     def __scrape_img_url(self):
         try:
             father = self.driver.find_element_by_class_name('image-viewer')
-            img = father.find_element_by_class_name('magnifier-image').get_attribute('src')
+            img_url = father.find_element_by_class_name('magnifier-image').get_attribute('src')
         except NoSuchElementException:
-            img = None
-        return img
+            try:
+                father = self.driver.find_element_by_class_name('ui-image-viewer')
+                img_url = father.find_element_by_tag_name('img').get_attribute('src')
+            except NoSuchElementException:
+                img_url = None
+        return img_url
 
     def is_well_scraped(self):
         return self.fully_scraped
@@ -220,12 +224,12 @@ class AliexpressScraper:
 # url = 'http://s.click.aliexpress.com/e/cmTHqhA0'
 #
 # def scrape(url):
-# scr = AliexpressScraper(url)
-# if not scr.is_well_scraped():
-# print(f'CHECK IT {url}')
-# scr = scr.to_dict()
-# print(scr)
-# return scr
+#     scr = AliexpressScraper(url)
+#     if not scr.is_well_scraped():
+#         print(f'CHECK IT {url}')
+#     scr = scr.to_dict()
+#     print(scr)
+#     return scr
 #
 # for url in urls:
 # scrape(url)
