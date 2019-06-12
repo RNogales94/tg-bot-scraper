@@ -5,3 +5,4 @@ pandas
 selenium
 flask_cors
 gunicorn
+requests_html

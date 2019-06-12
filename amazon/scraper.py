@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import re
 from scraper.selenium_web_driver import SeleniumChromeDriver
 from selenium.common.exceptions import NoSuchElementException
-from amazon.tools import expand_url
+from utils.web_utils import expand_url
 
 
 def captureURLs(text):
