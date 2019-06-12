@@ -1,6 +1,6 @@
 import re
 import json
-from utils.web_utils import expand_url
+from utils.web_utils import expand_url, is_amazon
 
 from amazon.scraper import AmazonScraper
 
@@ -8,11 +8,7 @@ from amazon.scraper import AmazonScraper
 class AmazonTools:
     @classmethod
     def is_valid_url(cls, url):
-        url_pattern = re.compile('http[s]?://(www.)?amazon\.(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
-        if re.match(pattern=url_pattern, string=url):
-            return True
-        else:
-            return False
+        return is_amazon(url)
 
     @classmethod
     def modify_url(cls, url, tag):

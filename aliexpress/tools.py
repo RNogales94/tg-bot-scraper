@@ -1,16 +1,13 @@
 import re
 import json
 from aliexpress.scraper import AliexpressScraper
+from utils.web_utils import is_aliexpress
 
 
 class AliexpressTools:
     @classmethod
     def is_valid_url(cls, url):
-        url_pattern = re.compile('http[s]?://([a-z]+)?\.?aliexpress\.(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
-        if re.match(pattern=url_pattern, string=url):
-            return True
-        else:
-            return False
+        return is_aliexpress(url)
 
     @classmethod
     def scrape(cls, url):
