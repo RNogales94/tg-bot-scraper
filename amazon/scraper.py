@@ -46,7 +46,7 @@ class AmazonScraper:
             self.__scrape_description()
             self.__scrape_features()
             self.__scrape_old_price(self.soup)
-            self.__scrape_title(self.soup)
+            self.__scrape_title()
             self.__scrape_size(self.soup)
             self.__scrape_img_url(self.soup)
             self.__scrape_end_date(self.soup)
@@ -88,9 +88,9 @@ class AmazonScraper:
         except Exception as e:
             print('[Scraper Warning] Old price')
 
-    def __scrape_title(self, soup):
+    def __scrape_title(self):
         try:
-            self.title = str.strip(soup.find(id='productTitle').contents[0])
+            self.title = self.driver.find_element_by_id('productTitle').text
         except Exception as e:
             print('[Scraper Error] Title in --> ' + self.url)
             self.fully_scraped = False

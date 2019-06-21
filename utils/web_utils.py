@@ -9,8 +9,7 @@ def expand_url(url):
 
 
 def is_amazon(url):
-    url_pattern = re.compile(
-        'http[s]?://(www.)?amazon\.(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
+    url_pattern = re.compile('http[s]?://(www.)?amazon\.(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
     if re.match(pattern=url_pattern, string=url):
         return True
     else:
@@ -18,8 +17,7 @@ def is_amazon(url):
 
 
 def is_aliexpress(url):
-    url_pattern = re.compile(
-        'http[s]?://(m\.)?([a-z]+)?\.?aliexpress\.(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
+    url_pattern = re.compile('http[s]?://(m\.)?([a-z]+)?\.?aliexpress\.(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
     if re.match(pattern=url_pattern, string=url):
         return True
     else:

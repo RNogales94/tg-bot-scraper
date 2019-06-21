@@ -24,12 +24,21 @@ class AliexpressScraper:
         self.is_captcha = None
 
         self.driver = SeleniumChromeDriver().driver
+
+        local_cookie = {'name': 'aep_usuc_f',
+                        'value': 'site=glo&province=919986676578000000&city=919986676578011000&c_tp=EUR&region=ES&b_locale=en_US'}
+
+
         self.driver.get(url)
+        self.driver.add_cookie({'name': local_cookie['name'],
+                                'value': local_cookie['value'],
+                                'domain': 'aliexpress.com'
+                                })
 
-        source_html = self.driver.page_source
-        self.soup = BeautifulSoup(source_html, "html.parser")
+        # source_html = self.driver.page_source
+        # self.soup = BeautifulSoup(source_html, "html.parser")
 
-        if self.__error_captcha(self.soup):
+        if self.__error_captcha():
             self.is_captcha = True
             self.fully_scraped = False
 
@@ -52,7 +61,7 @@ class AliexpressScraper:
 
 
     @staticmethod
-    def __error_captcha(soup):
+    def __error_captcha():
         return False
 
     def __scrape_title(self):
@@ -85,6 +94,7 @@ class AliexpressScraper:
         except NoSuchElementException:
             try:
                 old_price = self.driver.find_element_by_class_name('p-del-price-content').text
+
             except NoSuchElementException:
                 print('[Scraper Error] Old Price in --> ' + self.url)
                 old_price = None
@@ -93,6 +103,8 @@ class AliexpressScraper:
 
     @staticmethod
     def __format_price(price):
+        if price is None:
+            return None
         print(price)
         if len(price.split()) == 2:
             currency, amount = price.split()
@@ -150,93 +162,3 @@ class AliexpressScraper:
         return response
 
 
-
-
-
-
-# urls = [
-# 'http://s.click.aliexpress.com/e/cmKQ0LEo',
-# 'http://s.click.aliexpress.com/e/b4dj7tZA',
-# 'http://s.click.aliexpress.com/e/bSNeQdbK',
-# 'http://s.click.aliexpress.com/e/cODenJTK',
-# 'http://s.click.aliexpress.com/e/fo3wXms',
-# 'http://s.click.aliexpress.com/e/ff3wCU0',
-# 'http://s.click.aliexpress.com/e/IptPVuM',
-# 'http://s.click.aliexpress.com/e/bKU0YC0s',
-# 'http://s.click.aliexpress.com/e/e0tM9Gy',
-# 'http://s.click.aliexpress.com/e/NK8ProG',
-# 'http://s.click.aliexpress.com/e/bCCZGVI0',
-# 'http://s.click.aliexpress.com/e/TbQAfrK',
-# 'http://s.click.aliexpress.com/e/cmKQ0LEo',
-# 'http://s.click.aliexpress.com/e/cdcN96Y',
-# 'http://s.click.aliexpress.com/e/bALHPYFq',
-# 'http://s.click.aliexpress.com/e/bSYmNaFA',
-# 'http://s.click.aliexpress.com/e/b8a71yYo',
-# 'http://s.click.aliexpress.com/e/i7yUpLE',
-# 'http://s.click.aliexpress.com/e/c3Ad6Blq',
-# 'http://s.click.aliexpress.com/e/Yzt0YjA',
-# 'http://s.click.aliexpress.com/e/SBhzjyy',
-# 'http://s.click.aliexpress.com/e/bypOmruM',
-# 'http://s.click.aliexpress.com/e/b5H42QBq',
-# 'http://s.click.aliexpress.com/e/nkaA3rE',
-# 'http://s.click.aliexpress.com/e/bAMSokla',
-# 'http://s.click.aliexpress.com/e/gREJ2ne',
-# 'http://s.click.aliexpress.com/e/c47PIFxS',
-# 'http://s.click.aliexpress.com/e/ckrkSLBE',
-# 'http://s.click.aliexpress.com/e/cfu1GiaG',
-# 'http://s.click.aliexpress.com/e/ihX7NHW',
-# 'http://s.click.aliexpress.com/e/bzHIKg0',
-# 'http://s.click.aliexpress.com/e/fYWI86M',
-# 'http://s.click.aliexpress.com/e/bBuI2d9O',
-# 'http://s.click.aliexpress.com/e/cWBBzVnK',
-# 'http://s.click.aliexpress.com/e/bEUwmKPO',
-# 'http://s.click.aliexpress.com/e/b1mo3doM',
-# 'http://s.click.aliexpress.com/e/24tkFTS',
-# 'http://s.click.aliexpress.com/e/c3whEN0c',
-# 'http://s.click.aliexpress.com/e/cdcN96Y',
-# 'http://s.click.aliexpress.com/e/bALHPYFq',
-# 'http://s.click.aliexpress.com/e/bSYmNaFA',
-# 'http://s.click.aliexpress.com/e/b8a71yYo',
-# 'http://s.click.aliexpress.com/e/i7yUpLE',
-# 'http://s.click.aliexpress.com/e/biLR0IAk',
-# 'http://s.click.aliexpress.com/e/c3Ad6Blq',
-# 'http://s.click.aliexpress.com/e/Yzt0YjA',
-# 'http://s.click.aliexpress.com/e/cC5LBGSG',
-# 'http://s.click.aliexpress.com/e/SBhzjyy',
-# 'http://s.click.aliexpress.com/e/b5H42QBq',
-# 'http://s.click.aliexpress.com/e/cNKj8U0u',
-# 'http://s.click.aliexpress.com/e/nkaA3rE',
-# 'http://s.click.aliexpress.com/e/b1ZNqSyC',
-# 'http://s.click.aliexpress.com/e/bAMSokla',
-# 'http://s.click.aliexpress.com/e/gREJ2ne',
-# 'http://s.click.aliexpress.com/e/ckrkSLBE',
-# 'http://s.click.aliexpress.com/e/cfu1GiaG',
-# 'http://s.click.aliexpress.com/e/ihX7NHW',
-# 'http://s.click.aliexpress.com/e/bzHIKg0',
-# 'http://s.click.aliexpress.com/e/fYWI86M',
-# 'http://s.click.aliexpress.com/e/clYB9Ay0',
-# 'http://s.click.aliexpress.com/e/bBuI2d9O',
-# 'http://s.click.aliexpress.com/e/FgLs5n2',
-# 'http://s.click.aliexpress.com/e/b3Tju7yU'
-# ]
-#
-# from aliexpress.scraper import AliexpressScraper
-# url = 'http://s.click.aliexpress.com/e/cmTHqhA0'
-#
-# def scrape(url):
-#     scr = AliexpressScraper(url)
-#     if not scr.is_well_scraped():
-#         print(f'CHECK IT {url}')
-#     scr = scr.to_dict()
-#     print(scr)
-#     return scr
-#
-# for url in urls:
-# scrape(url)
-
-# url = 'http://s.click.aliexpress.com/e/cdcN96Y'
-# # url = ' http://s.click.aliexpress.com/e/cmTHqhA0'
-# url = expand_url(url)
-# print(url)
-# p = start(url)
-# print(p)
