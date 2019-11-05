@@ -8,7 +8,7 @@ import os
 class SeleniumChromeDriver:
     def __init__(self):
         CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH', '/usr/local/bin/chromedriver')
-        GOOGLE_CHROME_BIN = os.environ.get('GOOGLE_CHROME_BIN', '/usr/bin/google-chrome')
+        GOOGLE_CHROME_BIN = os.environ.get('GOOGLE_CHROME_BIN', '/usr/bin/google-chrome-stable')
 
         options = Options()
         options.binary_location = GOOGLE_CHROME_BIN

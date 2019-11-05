@@ -56,15 +56,13 @@ def scrape():
 
     print('-------------------------------------------------')
     print("Scraping")
+
     url = request.json.get('url')
 
     response, status = scrape_url(url)
 
     print('*************************************************')
     return Response(response, status=status, mimetype='application/json')
-
-
-
 
 
 if __name__ == '__main__':
