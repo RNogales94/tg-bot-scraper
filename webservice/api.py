@@ -19,7 +19,7 @@ def is_valid_url(url):
 
 def scrape_url(url):
     print(url)
-    if url == '':
+    if url is None:
         print('Parameter url not found: 400 Error')
         return Response(json.dumps({'Error': 'Parameter url not found'}), status=400, mimetype='application/json')
 
@@ -57,7 +57,7 @@ def scrape():
     print('-------------------------------------------------')
     print("Scraping")
 
-    url = request.json.get('url')
+    url = request.json.get('url', None)
 
     response, status = scrape_url(url)
 

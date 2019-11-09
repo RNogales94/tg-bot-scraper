@@ -113,7 +113,7 @@ class AmazonScraper:
         except Exception as e:
             try:
                 images = str.strip(soup.find(id='imgBlkFront')['data-a-dynamic-image'])
-                urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', images)
+                urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', images)
                 self.image_url = urls[-1]
             except Exception as e:
                 print('[Scraper Error] Main image in --> ' + self.url)
@@ -141,7 +141,8 @@ class AmazonScraper:
                 'price': self.price,
                 'url': self.url,
                 'image_url': self.image_url,
-                'size': self.size
+                'size': self.size,
+                'is_captcha': self.is_captcha
              }
         return response
 

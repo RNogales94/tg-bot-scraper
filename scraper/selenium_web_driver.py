@@ -14,8 +14,19 @@ class SeleniumChromeDriver:
         options.binary_location = GOOGLE_CHROME_BIN
         options.add_argument('--disable-gpu')
         options.add_argument('--no-sandbox')
-        options.headless = True
+        use_headless = os.environ.get('USE_CHROME_HEADLESS', True)
+
+        if use_headless == True:
+            options.headless = True
+        else:
+            if use_headless == 'TRUE':
+                use_headless = True
+            elif use_headless == 'FALSE':
+                use_headless = False
+            else:
+                use_headless = False
+            options.headless = use_headless
 
         print('Building Chrome Driver')
-        self.driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=options)
+        self.driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=options)
 
