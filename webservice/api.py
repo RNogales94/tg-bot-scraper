@@ -57,11 +57,15 @@ def scrape():
     print('-------------------------------------------------')
     print("Scraping")
     if request.json is None:
-        error = {"Error": "Bad request: JSON not found in body request, 'url' attribute is mandatory"}
+        error = {"Error": "Missing url"}
         return Response(json.dumps(error), status=400, mimetype='application/json')
 
     url = request.json.get('url', None)
     response, status = scrape_url(url)
+
+    if json.loads(response)['is_captcha']:
+        error = {"Error": "Amazon is blocking the bot with a CAPTCHA, try again later"}
+        return Response(json.dumps(error), status=503, mimetype='application/json')
 
     print('*************************************************')
     return Response(response, status=status, mimetype='application/json')

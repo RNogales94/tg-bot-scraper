@@ -10,4 +10,5 @@ def test_expand_url():
     short = 'https://amzn.to/31ftG0O'
     expanded = 'https://www.amazon.es/WOWGO-autom%C3%A1tica-Dispensador-silenciosa-Anti-mordedura/dp/B07CHKP6JW?SubscriptionId=AKIAIKPCRXSD7LRXGZWQ&tag=chollosxpress-21&linkCode=xm2&camp=2025&creative=165953&creativeASIN=B07CHKP6JW'
     assert expand_url(short) == expanded
-    assert expand_url('no_url') is None
+    assert expand_url('no_url') is 'no_url'
+
