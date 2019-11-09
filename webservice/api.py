@@ -21,11 +21,15 @@ def scrape_url(url):
     print(url)
     if url is None:
         print('Parameter url not found: 400 Error')
-        return {'Error': 'Parameter url not found'}, 400
+        response = json.dumps({'Error': 'Parameter url not found'})
+        status = 400
+        return response, status
 
     if url == '':
         print('url empty')
-        return {'Error': 'url is empty'}, 400
+        response = json.dumps({'Error': 'url is empty'})
+        status = 400
+        return response, status
 
     url = expand_url(url)
     if AmazonTools.is_valid_url(url):
