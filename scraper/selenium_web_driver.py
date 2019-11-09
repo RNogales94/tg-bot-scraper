@@ -4,8 +4,7 @@ from utils.singleton import Singleton
 import os
 
 
-@Singleton
-class SeleniumChromeDriver:
+class SeleniumChromeDriver(metaclass=Singleton):
     def __init__(self):
         CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH', '/usr/local/bin/chromedriver')
         GOOGLE_CHROME_BIN = os.environ.get('GOOGLE_CHROME_BIN', '/usr/bin/google-chrome-stable')
