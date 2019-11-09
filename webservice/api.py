@@ -56,9 +56,11 @@ def scrape():
 
     print('-------------------------------------------------')
     print("Scraping")
+    if request.json is None:
+        error = {"Error": "Bad request: JSON not found in body request, 'url' attribute is mandatory"}
+        return Response(json.dumps(error), status=400, mimetype='application/json')
 
     url = request.json.get('url', None)
-
     response, status = scrape_url(url)
 
     print('*************************************************')
