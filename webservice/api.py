@@ -21,7 +21,11 @@ def scrape_url(url):
     print(url)
     if url is None:
         print('Parameter url not found: 400 Error')
-        return Response(json.dumps({'Error': 'Parameter url not found'}), status=400, mimetype='application/json')
+        return {'Error': 'Parameter url not found'}, 400
+
+    if url == '':
+        print('url empty')
+        return {'Error': 'url is empty'}, 400
 
     url = expand_url(url)
     if AmazonTools.is_valid_url(url):
@@ -63,9 +67,10 @@ def scrape():
     url = request.json.get('url', None)
     response, status = scrape_url(url)
 
-    if json.loads(response)['is_captcha']:
-        error = {"Error": "Amazon is blocking the bot with a CAPTCHA, try again later"}
-        return Response(json.dumps(error), status=503, mimetype='application/json')
+    if status == 200:
+        if json.loads(response)['is_captcha']:
+            error = {"Error": "Amazon is blocking the bot with a CAPTCHA, try again later"}
+            return Response(json.dumps(error), status=503, mimetype='application/json')
 
     print('*************************************************')
     return Response(response, status=status, mimetype='application/json')
