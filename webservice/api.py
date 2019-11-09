@@ -3,7 +3,7 @@ from amazon.tools import AmazonTools
 from aliexpress.tools import AliexpressTools
 from flask_cors import CORS
 from urllib.parse import urlparse
-from utils.web_utils import expand_url
+from utils.url_utils import expand_url
 
 import json
 

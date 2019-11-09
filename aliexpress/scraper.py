@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from selenium.common.exceptions import NoSuchElementException
 from scraper.selenium_web_driver import SeleniumChromeDriver
 
-from utils.web_utils import expand_url
+from utils.url_utils import expand_url
 
 
 class AliexpressScraper:

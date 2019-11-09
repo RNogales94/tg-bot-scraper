@@ -1,7 +1,7 @@
 import re
 import json
 from aliexpress.scraper import AliexpressScraper
-from utils.web_utils import is_aliexpress
+from utils.url_utils import is_aliexpress
 
 
 class AliexpressTools:

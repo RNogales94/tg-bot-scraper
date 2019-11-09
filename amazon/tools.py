@@ -1,6 +1,6 @@
 import re
 import json
-from utils.web_utils import expand_url, is_amazon
+from utils.url_utils import expand_url, is_amazon
 
 from amazon.scraper import AmazonScraper
 
