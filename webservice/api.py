@@ -1,9 +1,7 @@
 from flask import Flask, Response, request
-from amazon.tools import AmazonTools
-from aliexpress.tools import AliexpressTools
 from flask_cors import CORS
-from urllib.parse import urlparse
-from utils.url_utils import expand_url
+from utils.url_utils import is_amazon
+from amazon.scraper import AmazonScraper
 
 import json
 
@@ -12,12 +10,12 @@ CORS(xbot_webservice)
 
 
 def is_valid_url(url):
-    is_amazon = 'amazon' in urlparse(url).netloc.split('.')
-    is_aliexpress = AliexpressTools.is_valid_url(url)
-    return is_amazon or is_aliexpress
+    return is_amazon(url)
 
 
 def scrape_url(url):
+    amazon_scraper = AmazonScraper()
+
     print(url)
     if url is None:
         print('Parameter url not found: 400 Error')
@@ -31,11 +29,17 @@ def scrape_url(url):
         status = 400
         return response, status
 
-    url = expand_url(url)
-    if AmazonTools.is_valid_url(url):
-        response, status = AmazonTools.scrape(url)
-    elif AliexpressTools.is_valid_url(url):
-        response, status = AliexpressTools.scrape(url)
+    if is_valid_url(url):
+        try:
+            data = amazon_scraper.scrape(url)
+            response = json.dumps(data)
+            status = 200
+        except Exception as e:
+            response = json.dumps({'Error': f'{e}'})
+            print(response)
+            status = 500
+    # elif AliexpressTools.is_valid_url(url):
+    #     response, status = AliexpressTools.scrape(url)
     else:
         response = json.dumps({'Error': f'{url} is not valid Amazon/Aliexpress product URL'})
         print(response)
