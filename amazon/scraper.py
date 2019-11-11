@@ -58,9 +58,8 @@ class AmazonScraper(metaclass=Singleton):
         Still a dummy method, return always False
         :return:
         """
-        d = self.driver
-        if d is not None:
-            return False
+        if self.driver.title == 'Amazon CAPTCHA':
+            return True
         else:
             return False
 
