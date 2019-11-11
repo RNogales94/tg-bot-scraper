@@ -55,10 +55,10 @@ class AmazonScraper(metaclass=Singleton):
 
     def __is_captcha(self):
         """
-        Still a dummy method, return always False
-        :return:
+        Boolean method, return if selenium driver arrives to Amazon CAPTCHA page.
+        :return: True or False
         """
-        if self.driver.title == 'Amazon CAPTCHA':
+        if self.driver.title in ['Amazon CAPTCHA', '503 - Service Unavailable Error']:
             return True
         else:
             return False
