@@ -1,23 +1,17 @@
-from bs4 import BeautifulSoup
-
-import re
 from scraper.selenium_web_driver import SeleniumChromeDriver
 from selenium.common.exceptions import NoSuchElementException
 from utils.url_utils import expand_url
+from utils.singleton import Singleton
 
 
-def captureURLs(text):
-    urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text)
-    return urls
+class AmazonScraper(metaclass=Singleton):
 
+    def __init__(self):
+        self.driver = SeleniumChromeDriver().driver
 
-class AmazonScraper:
-    def __init__(self, url):
-        print(f'Scrapeando {url}')
-        url = expand_url(url)
-
+        # Define Properties to scrape
         self.fully_scraped = True
-        self.url = url
+        self.url = None
         self.title = None
         self.description = None
         self.features = None
@@ -28,101 +22,144 @@ class AmazonScraper:
         self.image_url = None
         self.is_captcha = None
 
-        self.driver = SeleniumChromeDriver().driver
-        self.driver.get(url)
+    def scrape(self, url):
+        print(f'Scrapeando {url}')
+        self.url = expand_url(url)
 
-        source_html = self.driver.page_source
-        self.soup = BeautifulSoup(source_html, "html.parser")
+        self.driver.get(self.url)
 
-        # Scrape properties
-        #print(self.soup)
+        print(f'###########################\n{self.driver.title}\n##############################')
 
-        if self.soup.title.text == 'Amazon CAPTCHA':
+        if self.__is_captcha():
             self.is_captcha = True
 
         else:
             self.is_captcha = False
-            self.__scrape_price()
-            self.__scrape_description()
-            self.__scrape_features()
-            self.__scrape_old_price(self.soup)
-            self.__scrape_title()
-            self.__scrape_size(self.soup)
-            self.__scrape_img_url(self.soup)
-            self.__scrape_end_date(self.soup)
+            self.__get_properties()
+
+        response = {
+            'short_description': self.title,
+            'description': self.description,
+            'features': self.features,
+            'standard_price': self.old_price,
+            'end_date': self.end_date,
+            'price': self.price,
+            'url': self.url,
+            'image_url': self.image_url,
+            'size': self.size,
+            'is_captcha': self.is_captcha
+        }
+        return response
 
         print('[Scraper Info] Done')
 
+    def __is_captcha(self):
+        """
+        Still a dummy method, return always False
+        :return:
+        """
+        d = self.driver
+        if d is not None:
+            return False
+        else:
+            return False
+
+    def __get_properties(self):
+        self.__scrape_title()
+        self.__scrape_description()
+        self.__scrape_features()
+        self.__scrape_price()
+        self.__scrape_old_price()
+        self.__scrape_size()
+        self.__scrape_img_url()
+        self.__scrape_end_date()
+
+    def __scrape_title(self):
+        try:
+            self.title = self.driver.find_element_by_id('productTitle').text
+            print(f'[Scraper] Short Description: {self.title}')
+        except NoSuchElementException as e:
+            print('[Scraper Error] Title in --> ' + self.url)
+            self.fully_scraped = False
+
     def __scrape_description(self):
         try:
-            self.description = self.driver.find_element_by_id('productDescription').find_element_by_css_selector('p').text
+            product_descripition_el = self.driver.find_element_by_id('productDescription')
+            self.description = product_descripition_el.find_element_by_css_selector('p').text
+            print(f'[Scraper] Description: {self.description}')
         except NoSuchElementException:
             print('[Scraper Error] Description in --> ' + self.url)
 
     def __scrape_features(self):
         try:
             self.features = self.driver.find_element_by_id('feature-bullets').text
+            print(f'[Scraper] Features: {self.features}')
         except NoSuchElementException:
             print('[Scraper Error] Features in --> ' + self.url)
 
     def __scrape_price(self):
-        soup = self.soup
         try:
-            self.price = str.strip(soup.find(id='priceblock_dealprice').contents[0])
-        except:
+            self.price = self.driver.find_element_by_id('priceblock_dealprice').text
+            print(f'[Scraper] Price: {self.price}')
+        except NoSuchElementException:
             try:
-                self.price = str.strip(soup.find(id='priceblock_ourprice').contents[0])
-            except:
-                try:
-                    self.price = str.strip(soup.find_all('span', {'class': 'a-size-medium a-color-price'})[0].contents[0])
-                except:
-                    try:
-                        self.price = str.strip(soup.find('span', {'class': 'a-size-medium a-color-price offer-price a-text-normal'})[0].contents[0])
-                    except Exception as e:
-                        print('[Scraper Error] Price in --> ' + self.url)
-                        self.fully_scraped = False
+                self.price = self.driver.find_element_by_id('priceblock_ourprice').text
+                print(f'[Scraper] Price: {self.price}')
+            except NoSuchElementException:
+                # try:
+                #     self.price = str.strip(soup.find_all('span', {'class': 'a-size-medium a-color-price'})[0].contents[0])
+                # except:
+                #     try:
+                #         self.price = str.strip(soup.find('span', {'class': 'a-size-medium a-color-price offer-price a-text-normal'})[0].contents[0])
+                #     except Exception as e:
+                #         print('[Scraper Error] Price in --> ' + self.url)
+                #         self.fully_scraped = False
+                print('[Scraper Error] Price in --> ' + self.url)
 
-    def __scrape_old_price(self, soup):
+    def __scrape_old_price(self):
         try:
-            self.old_price = str.strip(soup.find_all('span', {'class': 'a-text-strike'})[0].contents[0])
-        except Exception as e:
-            print('[Scraper Warning] Old price')
+            price_element = self.driver.find_element_by_id('price')
+            css_selector = 'span.priceBlockStrikePriceString.a-text-strike'
+            old_price = price_element.find_element_by_css_selector(css_selector).text
+            self.old_price = old_price
+        except NoSuchElementException:
+            print('[Scraper Warning] Old price in --> ' + self.url)
 
-    def __scrape_title(self):
+    def __scrape_size(self):
         try:
-            self.title = self.driver.find_element_by_id('productTitle').text
-        except Exception as e:
-            print('[Scraper Error] Title in --> ' + self.url)
-            self.fully_scraped = False
-
-    def __scrape_size(self, soup):
-        try:
-            self.size = str.strip(soup.find(id='variation_size_name').find('option', selected=True).contents[0])
-        except Exception as e:
+            sizes_element = self.driver.find_element_by_id('variation_size_name')
+            self.size = sizes_element.find_element_by_class_name('dropdownSelect').text.strip()
+            # self.size = str.strip(soup.find(id='variation_size_name').find('option', selected=True).contents[0])
+        except NoSuchElementException:
             print('[Scraper Info] No sizes in --> ' + self.url)
 
-    def __scrape_img_url(self, soup):
+    def __scrape_img_url(self):
         try:
-            self.image_url = str.strip(soup.find(id='imgTagWrapperId').findChild('img')['data-old-hires'])
-            if self.image_url == '':
-                self.image_url = str.strip(soup.find(id='imgTagWrapperId').findChild('img')['src'])
-                if self.image_url.startswith('data:image/jpeg;base64'):
-                    text = soup.find(id='imgTagWrapperId').findChild('img')['data-a-dynamic-image']
-                    self.image_url = captureURLs(text)[0]
+            image_element = self.driver.find_element_by_id('imgTagWrapperId')
+            self.img_url = image_element.find_element_by_tag_name('img').get_attribute('src')
+        except NoSuchElementException:
+            print('[Scraper Error] Main image in --> ' + self.url)
 
-        except Exception as e:
-            try:
-                images = str.strip(soup.find(id='imgBlkFront')['data-a-dynamic-image'])
-                urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', images)
-                self.image_url = urls[-1]
-            except Exception as e:
-                print('[Scraper Error] Main image in --> ' + self.url)
-                self.fully_scraped = False
+        #     self.image_url = str.strip(soup.find(id='imgTagWrapperId').findChild('img')['data-old-hires'])
+        #     if self.image_url == '':
+        #         self.image_url = str.strip(soup.find(id='imgTagWrapperId').findChild('img')['src'])
+        #         if self.image_url.startswith('data:image/jpeg;base64'):
+        #             text = soup.find(id='imgTagWrapperId').findChild('img')['data-a-dynamic-image']
+        #             self.image_url = capture_urls(text)[0]
 
-    def __scrape_end_date(self, soup):
+        # except Exception as e:
+        #     try:
+        #         images = str.strip(soup.find(id='imgBlkFront')['data-a-dynamic-image'])
+        #         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', images)
+        #         self.image_url = urls[-1]
+        #     except Exception as e:
+        #         print('[Scraper Error] Main image in --> ' + self.url)
+        #         self.fully_scraped = False
+
+    def __scrape_end_date(self):
         try:
-            self.end_date = str.strip(soup.find(id=lambda x: x and x.startswith('deal_expiry_timer_')).contents[0])
-        except Exception as e:
+            self.end_date = self.driver.find_element_by_xpath('//*[starts-with(@id,"deal_expiry_timer_")]').text
+        except NoSuchElementException:
             print('[Scraper Info] No Temporal in --> ' + self.url)
 
     def is_well_scraped(self):
@@ -131,19 +168,6 @@ class AmazonScraper:
     def has_old_price(self):
         return self.old_price is not None
 
-    def to_dict(self):
-        response = {
-                'short_description': self.title,
-                'description': self.description,
-                'features': self.features,
-                'standard_price': self.old_price,
-                'end_date': self.end_date,
-                'price': self.price,
-                'url': self.url,
-                'image_url': self.image_url,
-                'size': self.size,
-                'is_captcha': self.is_captcha
-             }
-        return response
+
 
 
