@@ -28,7 +28,7 @@ class AmazonScraper(metaclass=Singleton):
 
         self.driver.get(self.url)
 
-        print(f'###########################\n{self.driver.title}\n##############################')
+        print(f'###########################\n[Scraper] {self.driver.title}\n##############################')
 
         if self.__is_captcha():
             self.is_captcha = True
