@@ -37,17 +37,28 @@ class AmazonScraper(metaclass=Singleton):
             self.is_captcha = False
             self.__get_properties()
 
+        short_description = self.title
+        description = self.description
+        features = self.features
+        standard_price = self.old_price
+        end_date = self.end_date
+        price = self.price
+        url = self.url
+        image_url = self.image_url
+        size = self.size
+        is_captcha = self.is_captcha
+
         response = {
-            'short_description': self.title,
-            'description': self.description,
-            'features': self.features,
-            'standard_price': self.old_price,
-            'end_date': self.end_date,
-            'price': self.price,
-            'url': self.url,
-            'image_url': self.image_url,
-            'size': self.size,
-            'is_captcha': self.is_captcha
+            'short_description': short_description,
+            'description': description,
+            'features': features,
+            'standard_price': standard_price,
+            'end_date': end_date,
+            'price': price,
+            'url': url,
+            'image_url': image_url,
+            'size': size,
+            'is_captcha': is_captcha,
         }
         return response
 
@@ -70,7 +81,7 @@ class AmazonScraper(metaclass=Singleton):
         self.__scrape_price()
         self.__scrape_old_price()
         self.__scrape_size()
-        self.__scrape_img_url()
+        self.__scrape_image_url()
         self.__scrape_end_date()
 
     def __scrape_title(self):
@@ -121,6 +132,8 @@ class AmazonScraper(metaclass=Singleton):
             css_selector = 'span.priceBlockStrikePriceString.a-text-strike'
             old_price = price_element.find_element_by_css_selector(css_selector).text
             self.old_price = old_price
+            print(f'[Scraper] Old Price: {self.old_price}')
+
         except NoSuchElementException:
             print('[Scraper Warning] Old price in --> ' + self.url)
 
@@ -128,14 +141,18 @@ class AmazonScraper(metaclass=Singleton):
         try:
             sizes_element = self.driver.find_element_by_id('variation_size_name')
             self.size = sizes_element.find_element_by_class_name('dropdownSelect').text.strip()
+            print(f'[Scraper] Size: {self.size}')
+
             # self.size = str.strip(soup.find(id='variation_size_name').find('option', selected=True).contents[0])
         except NoSuchElementException:
             print('[Scraper Info] No sizes in --> ' + self.url)
 
-    def __scrape_img_url(self):
+    def __scrape_image_url(self):
         try:
             image_element = self.driver.find_element_by_id('imgTagWrapperId')
-            self.img_url = image_element.find_element_by_tag_name('img').get_attribute('src')
+            self.image_url = image_element.find_element_by_tag_name('img').get_attribute('src')
+            print(f'[Scraper] image_url: {self.image_url}')
+
         except NoSuchElementException:
             print('[Scraper Error] Main image in --> ' + self.url)
 
