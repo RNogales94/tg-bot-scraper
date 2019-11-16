@@ -29,7 +29,6 @@ class AmazonScraper(metaclass=Singleton):
         print(f'Scrapeando {url}')
         self.__reset_scraper()
         self.url = expand_url(url)
-
         self.driver.get(self.url)
 
         print(f'###########################\n[Scraper] {self.driver.title}\n##############################')
@@ -125,7 +124,6 @@ class AmazonScraper(metaclass=Singleton):
                             el = self.driver.find_element_by_id('olpLinkWidget_feature_div')
                             self.price = el.find_element_by_class_name('a-color-price').text
                             print(f'[Scraper] Price: {self.price}')
-
                         except NoSuchElementException:
                             try:
                                 el = self.driver.find_element_by_id('olp-upd-new-freeshipping')
