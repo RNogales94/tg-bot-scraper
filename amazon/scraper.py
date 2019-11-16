@@ -117,7 +117,18 @@ class AmazonScraper(metaclass=Singleton):
                         self.price = self.driver.find_element_by_id('buyNewSection').text
                         print(f'[Scraper] Price: {self.price}')
                     except NoSuchElementException:
-                        print('[Scraper Error] Price in --> ' + self.url)
+                        try:
+                            el = self.driver.find_element_by_id('olpLinkWidget_feature_div')
+                            self.price = el.find_element_by_class_name('a-color-price').text
+                            print(f'[Scraper] Price: {self.price}')
+
+                        except NoSuchElementException:
+                            try:
+                                el = self.driver.find_element_by_id('olp-upd-new-freeshipping')
+                                self.price = el.find_element_by_class_name('a-color-price').text
+                                print(f'[Scraper] Price: {self.price}')
+                            except NoSuchElementException:
+                                print('[Scraper Error] Price in --> ' + self.url)
 
     def __scrape_old_price(self):
         try:
