@@ -10,6 +10,9 @@ class AmazonScraper(metaclass=Singleton):
         self.driver = SeleniumChromeDriver().driver
 
         # Define Properties to scrape
+        self.__reset_scraper()
+
+    def __reset_scraper(self):
         self.fully_scraped = True
         self.url = None
         self.title = None
@@ -24,6 +27,7 @@ class AmazonScraper(metaclass=Singleton):
 
     def scrape(self, url):
         print(f'Scrapeando {url}')
+        self.__reset_scraper()
         self.url = expand_url(url)
 
         self.driver.get(self.url)
@@ -37,28 +41,17 @@ class AmazonScraper(metaclass=Singleton):
             self.is_captcha = False
             self.__get_properties()
 
-        short_description = self.title
-        description = self.description
-        features = self.features
-        standard_price = self.old_price
-        end_date = self.end_date
-        price = self.price
-        url = self.url
-        image_url = self.image_url
-        size = self.size
-        is_captcha = self.is_captcha
-
         response = {
-            'short_description': short_description,
-            'description': description,
-            'features': features,
-            'standard_price': standard_price,
-            'end_date': end_date,
-            'price': price,
-            'url': url,
-            'image_url': image_url,
-            'size': size,
-            'is_captcha': is_captcha,
+            'short_description': self.title,
+            'description': self.description,
+            'features': self.features,
+            'standard_price': self.old_price,
+            'end_date': self.end_date,
+            'price': self.price,
+            'url': self.url,
+            'image_url': self.image_url,
+            'size': self.size,
+            'is_captcha': self.is_captcha,
         }
         return response
 
