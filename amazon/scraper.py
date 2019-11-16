@@ -90,6 +90,10 @@ class AmazonScraper(metaclass=Singleton):
             product_descripition_el = self.driver.find_element_by_id('productDescription')
             self.description = product_descripition_el.find_element_by_css_selector('p').text
             print(f'[Scraper] Description: {self.description}')
+            if self.description == '':
+                paragraphs = product_descripition_el.find_elements_by_css_selector('p')
+                paragraphs = list(map(lambda x: x.text.strip(), paragraphs))
+                self.description = '\n'.join(paragraphs).strip()
         except NoSuchElementException:
             print('[Scraper Error] Description in --> ' + self.url)
 
@@ -162,7 +166,13 @@ class AmazonScraper(metaclass=Singleton):
             print(f'[Scraper] image_url: {self.image_url}')
 
         except NoSuchElementException:
-            print('[Scraper Error] Main image in --> ' + self.url)
+            try:
+                el = self.driver.find_element_by_id('img-wrapper')
+                self.image_url = el.find_element_by_tag_name('img').get_attribute('src')
+                print(f'[Scraper] image_url: {self.image_url}')
+
+            except NoSuchElementException:
+                print('[Scraper Error] Main image in --> ' + self.url)
 
         #     self.image_url = str.strip(soup.find(id='imgTagWrapperId').findChild('img')['data-old-hires'])
         #     if self.image_url == '':
