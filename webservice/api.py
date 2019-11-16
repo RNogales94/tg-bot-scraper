@@ -1,6 +1,6 @@
 from flask import Flask, Response, request
 from flask_cors import CORS
-from utils.url_utils import is_amazon, expand_url
+from utils.url_utils import is_amazon, expand_url, get_ASIN
 from amazon.scraper import AmazonScraper
 
 import json
@@ -31,9 +31,13 @@ def scrape_url(url):
 
     url = expand_url(url)
     if '/offer-listing/' in url:
-        response = json.dumps({'Error': f'XBot - This link {url} contains multiple products, please choose only one'})
-        status = 400
-        return response, status
+        ASIN = get_ASIN(url)
+        if ASIN is not None:
+            url = f'https://www.amazon.es/dp/{ASIN}'
+        else:
+            response = json.dumps({'Error': f'XBot - This link {url} contains multiple products, please choose only one'})
+            status = 400
+            return response, status
 
     if is_valid_url(url):
         try:

@@ -8,6 +8,18 @@ def capture_urls(text):
     return urls
 
 
+def get_ASIN(url):
+    url = expand_url(url)
+    if is_amazon(url):
+        try:
+            asin = re.match(r'(.*)\/([A-Z0-9]{10})((\/)?(.*))?', url).groups()[1]
+            return asin
+        except AttributeError:
+            return None
+    else:
+        return None
+
+
 def expand_url(url):
     session = requests.Session()  # so connections are recycled
     try:

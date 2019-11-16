@@ -1,9 +1,6 @@
 from webservice.api import scrape_url
 import json
 
-catan_url = 'https://www.amazon.es/dp/B006CZ0LGA'
-response, status = scrape_url(catan_url)
-
 
 def test_scrape_url_format():
     catan_url = 'https://www.amazon.es/dp/B006CZ0LGA'
@@ -29,10 +26,6 @@ def test_scrape_url_format():
         print(f'Is not captcha {response["url"]}')
         assert "catan" in str.lower(response['short_description'])
         assert "catan" in str.lower(response['description'])
-
-
-url = 'https://www.google.com'
-response, status = scrape_url(url)
 
 
 def test_scrape_bad_url():
