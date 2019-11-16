@@ -1,6 +1,6 @@
 from flask import Flask, Response, request
 from flask_cors import CORS
-from utils.url_utils import is_amazon
+from utils.url_utils import is_amazon, expand_url
 from amazon.scraper import AmazonScraper
 
 import json
@@ -26,6 +26,12 @@ def scrape_url(url):
     if url == '':
         print('url empty')
         response = json.dumps({'Error': 'url is empty'})
+        status = 400
+        return response, status
+
+    url = expand_url(url)
+    if '/offer-listing/' in url:
+        response = json.dumps({'Error': f'XBot - This link {url} contains multiple products, please choose only one'})
         status = 400
         return response, status
 
