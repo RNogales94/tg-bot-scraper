@@ -111,10 +111,11 @@ class AmazonScraper(metaclass=Singleton):
             except NoSuchElementException:
                 try:
                     self.price = self.driver.find_element_by_id('priceblock_saleprice').text
+                    print(f'[Scraper] Price: {self.price}')
                 except NoSuchElementException:
                     try:
                         self.price = self.driver.find_element_by_id('buyNewSection').text
-
+                        print(f'[Scraper] Price: {self.price}')
                     except NoSuchElementException:
                         print('[Scraper Error] Price in --> ' + self.url)
 
