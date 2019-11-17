@@ -15,7 +15,7 @@ class SeleniumChromeDriver(metaclass=Singleton):
         options.add_argument('--no-sandbox')
         use_headless = os.environ.get('USE_CHROME_HEADLESS', True)
 
-        if use_headless == True:
+        if use_headless:
             options.headless = True
         else:
             if use_headless == 'TRUE':
