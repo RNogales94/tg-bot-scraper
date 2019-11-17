@@ -130,7 +130,11 @@ class AmazonScraper(metaclass=Singleton):
                                 self.price = el.find_element_by_class_name('a-color-price').text
                                 print(f'[Scraper] Price: {self.price}')
                             except NoSuchElementException:
-                                print('[Scraper Error] Price in --> ' + self.url)
+                                try:
+                                    self.price = self.driver.find_element_by_id('price_inside_buybox').text
+                                    print(f'[Scraper] Price: {self.price}')
+                                except NoSuchElementException:
+                                    print('[Scraper Error] Price in --> ' + self.url)
 
     def __scrape_old_price(self):
         try:
