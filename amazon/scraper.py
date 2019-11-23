@@ -2,12 +2,14 @@ from scraper.selenium_web_driver import SeleniumChromeDriver
 from selenium.common.exceptions import NoSuchElementException
 from utils.url_utils import expand_url
 from utils.singleton import Singleton
+import os
 
 
 class AmazonScraper(metaclass=Singleton):
 
     def __init__(self):
         self.driver = SeleniumChromeDriver().driver
+        self.api_key = os.environ.get('SCRAPEAPI_KEY', None)
 
         # Define Properties to scrape
         self.__reset_scraper()
@@ -30,7 +32,13 @@ class AmazonScraper(metaclass=Singleton):
         print(f'Scrapeando {url}')
         self.__reset_scraper()
         self.url = expand_url(url)
-        self.driver.get(self.url)
+
+        if self.api_key is None:
+            self.driver.get(self.url)
+        else:
+            url = f'http://api.scraperapi.com/?api_key={self.api_key}&url={self.url}'
+            self.driver.get(url)
+
 
         print(f'###########################\n[Scraper] {self.driver.title}\n##############################')
 
