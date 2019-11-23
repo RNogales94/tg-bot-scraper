@@ -4,6 +4,8 @@ from utils.url_utils import expand_url
 from utils.singleton import Singleton
 import os
 
+from utils.url_utils import is_amazon_product
+
 
 class AmazonScraper(metaclass=Singleton):
 
@@ -36,7 +38,8 @@ class AmazonScraper(metaclass=Singleton):
         if self.api_key is None:
             self.driver.get(self.url)
         else:
-            url = f'http://api.scraperapi.com/?api_key={self.api_key}&url={self.url}'
+            if is_amazon_product(url):
+                url = f'http://api.scraperapi.com/?api_key={self.api_key}&url={self.url}'
             self.driver.get(url)
 
 

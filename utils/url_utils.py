@@ -44,3 +44,13 @@ def is_amazon(url):
         print(f'Exception: Connection refused {url}')
         return False
     return 'amazon' in urllib.parse.urlparse(url).hostname
+
+
+def is_amazon_product(url):
+    url = expand_url(url)
+    if is_amazon(url) and ('/gb/' not in url) and ('/music/' not in url) and ('/prime/' not in url):
+        asin = get_ASIN(url)
+        if asin is not None:
+            return True
+    else:
+        return False
