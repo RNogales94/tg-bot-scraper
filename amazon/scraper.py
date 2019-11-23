@@ -106,41 +106,45 @@ class AmazonScraper(metaclass=Singleton):
     def __scrape_price(self):
         try:
             self.price = self.driver.find_element_by_id('priceblock_dealprice').text
-            print(f'[Scraper] Price: {self.price}')
+            print(f'[Scraper] Price: {self.price} - using -> priceblock_dealprice')
         except NoSuchElementException:
             try:
                 self.price = self.driver.find_element_by_id('priceblock_ourprice').text
-                print(f'[Scraper] Price: {self.price}')
+                print(f'[Scraper] Price: {self.price} - using -> priceblock_ourprice')
             except NoSuchElementException:
                 try:
                     self.price = self.driver.find_element_by_id('priceblock_saleprice').text
-                    print(f'[Scraper] Price: {self.price}')
+                    print(f'[Scraper] Price: {self.price} - using -> priceblock_saleprice')
                 except NoSuchElementException:
                     try:
                         self.price = self.driver.find_element_by_id('buyNewSection').text
-                        print(f'[Scraper] Price: {self.price}')
+                        print(f'[Scraper] Price: {self.price} - using -> buyNewSection')
                     except NoSuchElementException:
                         try:
                             el = self.driver.find_element_by_id('olpLinkWidget_feature_div')
                             self.price = el.find_element_by_class_name('a-color-price').text
-                            print(f'[Scraper] Price: {self.price}')
+                            print(f'[Scraper] Price: {self.price} - using -> olpLinkWidget_feature_div')
                         except NoSuchElementException:
                             try:
                                 el = self.driver.find_element_by_id('olp-upd-new-freeshipping')
                                 self.price = el.find_element_by_class_name('a-color-price').text
-                                print(f'[Scraper] Price: {self.price}')
+                                print(f'[Scraper] Price: {self.price} - using -> olp-upd-new-freeshipping')
                             except NoSuchElementException:
                                 try:
                                     self.price = self.driver.find_element_by_id('price_inside_buybox').text
-                                    print(f'[Scraper] Price: {self.price}')
+                                    print(f'[Scraper] Price: {self.price} - using -> price_inside_buybox')
                                 except NoSuchElementException:
                                     try:
                                         el = self.driver.find_element_by_id('price')
                                         self.price = el.find_element_by_class_name('a-color-price').text
-                                        print(f'[Scraper] Price: {self.price}')
-
+                                        print(f'[Scraper] Price: {self.price} - using -> price')
                                     except NoSuchElementException:
-                                        print('[Scraper Error] Price in --> ' + self.url)
+                                        try:
+                                            el = self.driver.find_element_by_id('olp-new')
+                                            self.price = el.find_element_by_class_name('a-color-price').text
+                                            print(f'[Scraper] Price: {self.price} - using -> olp-new')
+                                        except NoSuchElementException:
+                                            print('[Scraper Error] Price in --> ' + self.url)
 
     def __scrape_old_price(self):
         try:
