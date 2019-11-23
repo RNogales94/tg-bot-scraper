@@ -24,6 +24,7 @@ class AmazonScraper(metaclass=Singleton):
         self.price = None
         self.image_url = None
         self.is_captcha = None
+        self.driver.delete_all_cookies()
 
     def scrape(self, url):
         print(f'Scrapeando {url}')
