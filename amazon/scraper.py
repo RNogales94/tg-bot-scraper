@@ -11,7 +11,7 @@ class AmazonScraper(metaclass=Singleton):
 
     def __init__(self):
         self.driver = SeleniumChromeDriver().driver
-        self.api_key = os.environ.get('SCRAPEAPI_KEY', None)
+        self.api_key = os.environ.get('SCRAPEAPI_KEY', 'adfe255be6ddb5488a7fcef4bde677c6')
 
         # Define Properties to scrape
         self.__reset_scraper()
@@ -38,8 +38,7 @@ class AmazonScraper(metaclass=Singleton):
         if self.api_key is None:
             self.driver.get(self.url)
         else:
-            if is_amazon_product(url):
-                url = f'http://api.scraperapi.com/?api_key={self.api_key}&url={self.url}'
+            url = f'http://api.scraperapi.com/?api_key={self.api_key}&url={self.url}'
             self.driver.get(url)
 
 
