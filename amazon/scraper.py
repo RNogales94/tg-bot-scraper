@@ -41,7 +41,6 @@ class AmazonScraper(metaclass=Singleton):
             url = f'http://api.scraperapi.com/?api_key={self.api_key}&url={self.url}'
             self.driver.get(url)
 
-
         print(f'###########################\n[Scraper] {self.driver.title}\n##############################')
 
         if self.__is_captcha():
