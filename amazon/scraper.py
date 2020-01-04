@@ -1,10 +1,15 @@
 from scraper.selenium_web_driver import SeleniumChromeDriver
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import money_parser
 from utils.url_utils import expand_url
 from utils.singleton import Singleton
 import os
 
-from utils.url_utils import is_amazon_product
+import re
 
 
 class AmazonScraper(metaclass=Singleton):
@@ -26,6 +31,9 @@ class AmazonScraper(metaclass=Singleton):
         self.size = None
         self.old_price = None
         self.price = None
+        self.coupon_code = None
+        self.coupon_discount = None
+        self.coupon_price = None
         self.image_url = None
         self.is_captcha = None
         self.driver.delete_all_cookies()
@@ -57,6 +65,9 @@ class AmazonScraper(metaclass=Singleton):
             'standard_price': self.old_price,
             'end_date': self.end_date,
             'price': self.price,
+            'coupon_code': self.coupon_code,
+            'coupon_discount': self.coupon_discount,
+            'coupon_price': self.coupon_price,
             'url': self.url,
             'image_url': self.image_url,
             'size': self.size,
@@ -217,6 +228,24 @@ class AmazonScraper(metaclass=Singleton):
             self.end_date = self.driver.find_element_by_xpath('//*[starts-with(@id,"deal_expiry_timer_")]').text
         except NoSuchElementException:
             print('[Scraper Info] No Temporal in --> ' + self.url)
+
+    def __scrape_coupon(self):
+        try:
+            coupon_link = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, 'applicable_promotion_list_sec')))
+            ActionChains(self.driver).move_to_element(coupon_link).perform()
+            coupon_text = self.driver.find_element_by_id('a-popover-content-3').text
+
+            pattern = 'Ahorra un (?P<discount>\d+([\,\.]\d+)?)%.*c.digo\s(?P<code>\S+).*'
+            match = re.search(pattern, coupon_text)
+            if match is not None:
+                self.coupon_code = match.group('code')
+                self.coupon_discount = match.group('discount')
+                self.coupon_price = float(money_parser.price_dec(self.price)) * float(self.coupon_discount) / 100
+                self.coupon_price = f'{self.coupon_price} €'
+        except NoSuchElementException:
+            print('[Scraper Info] No Coupon in --> ' + self.url)
+        except Exception as e:
+            print('[ERROR Scraper Info] Exception is not beign well handled in coupon scraper--> \n' + e)
 
     def is_well_scraped(self):
         return self.fully_scraped

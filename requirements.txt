@@ -6,3 +6,4 @@ selenium
 flask_cors
 gunicorn
 requests_html
+money-parser
