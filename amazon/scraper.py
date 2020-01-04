@@ -1,5 +1,5 @@
 from scraper.selenium_web_driver import SeleniumChromeDriver
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -96,6 +96,7 @@ class AmazonScraper(metaclass=Singleton):
         self.__scrape_size()
         self.__scrape_image_url()
         self.__scrape_end_date()
+        self.__scrape_coupon()
 
     def __scrape_title(self):
         try:
@@ -207,22 +208,6 @@ class AmazonScraper(metaclass=Singleton):
             except NoSuchElementException:
                 print('[Scraper Error] Main image in --> ' + self.url)
 
-        #     self.image_url = str.strip(soup.find(id='imgTagWrapperId').findChild('img')['data-old-hires'])
-        #     if self.image_url == '':
-        #         self.image_url = str.strip(soup.find(id='imgTagWrapperId').findChild('img')['src'])
-        #         if self.image_url.startswith('data:image/jpeg;base64'):
-        #             text = soup.find(id='imgTagWrapperId').findChild('img')['data-a-dynamic-image']
-        #             self.image_url = capture_urls(text)[0]
-
-        # except Exception as e:
-        #     try:
-        #         images = str.strip(soup.find(id='imgBlkFront')['data-a-dynamic-image'])
-        #         urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', images)
-        #         self.image_url = urls[-1]
-        #     except Exception as e:
-        #         print('[Scraper Error] Main image in --> ' + self.url)
-        #         self.fully_scraped = False
-
     def __scrape_end_date(self):
         try:
             self.end_date = self.driver.find_element_by_xpath('//*[starts-with(@id,"deal_expiry_timer_")]').text
@@ -231,11 +216,11 @@ class AmazonScraper(metaclass=Singleton):
 
     def __scrape_coupon(self):
         try:
-            coupon_link = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, 'applicable_promotion_list_sec')))
+            coupon_link = WebDriverWait(self.driver, 1).until(EC.visibility_of_element_located((By.ID, 'applicable_promotion_list_sec')))
             ActionChains(self.driver).move_to_element(coupon_link).perform()
             coupon_text = self.driver.find_element_by_id('a-popover-content-3').text
 
-            pattern = 'Ahorra un (?P<discount>\d+([\,\.]\d+)?)%.*c.digo\s(?P<code>\S+).*'
+            pattern = r'Ahorra un (?P<discount>\d+([\,\.]\d+)?)%.*c.digo\s(?P<code>\S+).*'
             match = re.search(pattern, coupon_text)
             if match is not None:
                 self.coupon_code = match.group('code')
@@ -244,8 +229,10 @@ class AmazonScraper(metaclass=Singleton):
                 self.coupon_price = f'{self.coupon_price} €'
         except NoSuchElementException:
             print('[Scraper Info] No Coupon in --> ' + self.url)
+        except TimeoutException:
+            print('[Scraper Info] No Coupon in --> ' + self.url)
         except Exception as e:
-            print('[ERROR Scraper Info] Exception is not beign well handled in coupon scraper--> \n' + e)
+            print('[ERROR Scraper Info] Exception is not being well handled in coupon scraper--> \n' + str(e))
 
     def is_well_scraped(self):
         return self.fully_scraped
