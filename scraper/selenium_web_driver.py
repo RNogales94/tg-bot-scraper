@@ -27,7 +27,7 @@ class SeleniumChromeDriver(metaclass=Singleton):
                 use_headless = False
             options.headless = use_headless
 
-        options.headless = False
+        options.headless = True
 
         print('Building Chrome Driver')
         self.driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, options=options)
