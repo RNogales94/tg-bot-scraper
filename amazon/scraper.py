@@ -46,7 +46,8 @@ class AmazonScraper(metaclass=Singleton):
         if self.api_key is None:
             self.driver.get(self.url)
         else:
-            url = f'http://api.scraperapi.com/?api_key={self.api_key}&url={self.url}'
+            country = 'ue'
+            url = f'http://api.scraperapi.com/?api_key={self.api_key}&url={self.url}&country_code={country}'
             self.driver.get(url)
 
         print(f'###########################\n[Scraper] {self.driver.title}\n##############################')
@@ -226,11 +227,22 @@ class AmazonScraper(metaclass=Singleton):
                 self.coupon_code = match.group('code')
                 self.coupon_discount = match.group('discount')
                 self.coupon_price = float(money_parser.price_dec(self.price)) * float(self.coupon_discount) / 100
-                self.coupon_price = f'{self.coupon_price} €'
-        except NoSuchElementException:
+                self.coupon_price = f'{round(self.coupon_price, 2)} €'
+
+        except (NoSuchElementException, TimeoutException):
             print('[Scraper Info] No Coupon in --> ' + self.url)
-        except TimeoutException:
-            print('[Scraper Info] No Coupon in --> ' + self.url)
+            try:
+                coupon_text = self.driver.find_element_by_id('applicable_promotion_list_sec').text
+                pattern = r'\s+(?P<discount>(\d+)[\.\,]?(\d+)?%) OFF: (?P<code>\w+)\.\s+'
+                match = re.search(pattern, coupon_text)
+                if match is not None:
+                    self.coupon_code = match.group('code')
+                    self.coupon_discount = match.group('discount')
+                    self.coupon_price = float(money_parser.price_dec(self.price)) * float(self.coupon_discount) / 100
+                    self.coupon_price = f'{round(self.coupon_price, 2)} €'
+
+            except (NoSuchElementException, TimeoutException):
+                print('[Scraper Info] No Coupon in --> ' + self.url)
         except Exception as e:
             print('[ERROR Scraper Info] Exception is not being well handled in coupon scraper--> \n' + str(e))
 
