@@ -46,6 +46,17 @@ def is_amazon(url):
     return 'amazon' in urllib.parse.urlparse(url).hostname
 
 
+def is_aliexpress(url):
+    if url is None:
+        return False
+    try:
+        url = expand_url(url)
+    except requests.exceptions.ConnectionError:
+        print(f'Exception: Connection refused {url}')
+        return False
+    return 'aliexpress' in urllib.parse.urlparse(url).hostname
+
+
 def is_amazon_product(url):
     url = expand_url(url)
     if is_amazon(url) and ('/gb/' not in url) and ('/music/' not in url) and ('/prime/' not in url):

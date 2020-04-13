@@ -1,4 +1,4 @@
-from utils.url_utils import capture_urls, expand_url, get_ASIN
+from utils.url_utils import capture_urls, expand_url, get_ASIN, is_aliexpress
 
 
 def test_get_ASIN():
@@ -31,3 +31,7 @@ def test_expand_url():
     assert expand_url(short) == expanded
     assert expand_url('no_url') is 'no_url'
 
+
+def test_is_aliexpress():
+    url = 'https://es.aliexpress.com/item/10000008027797.html?mb=zNbw7rRQY4RJmED&srcSns=Plus&tid=white_backgroup_101&tt=org.telegram.plus&image=U229e328280e24b66a06e8d1ed8f6e6bax.jpg&aff_request_id=9bc2a5b41978475583a918e1c36dcd45-1586772007439-06914-_dZdXx5S&spreadType=socialShare&aff_platform=default&sk=_dZdXx5S&aff_trace_key=9bc2a5b41978475583a918e1c36dcd45-1586772007439-06914-_dZdXx5S&businessType=ProductDetail&templateId=white_backgroup_101&title=%E2%82%AC+199%2C49++24%25de+DESCUENTO+%7C+CHUWI+HeroBook+pantalla+IPS+de+14%2C1+pulgadas+Intel+E8000+Quad+Core+Windows+10+OS+4GB+RAM+64GB+ROM+ordenador+port%C3%A1til+con+la+disposici%C3%B3n+de+teclado&platform=AE&terminal_id=d0cf318a7415401e8bd43cacb8e3fd67'
+    assert is_aliexpress(url)
