@@ -178,13 +178,18 @@ class AmazonScraper(metaclass=Singleton):
             old_price = price_element.find_element_by_css_selector(css_selector).text
             self.old_price = old_price
             print(f'[Scraper] Old Price: {self.old_price}')
-
         except NoSuchElementException:
             try:
-                el = self.driver.find_element_by_id('buyBoxInner')
-                self.old_price = el.find_element_by_class_name('a-text-strike').text
+                price_element = self.driver.find_element_by_id('price')
+                old_price = price_element.find_element_by_class_name('priceBlockStrikePriceString').text
+                self.old_price = old_price
+                print(f'[Scraper] Old Price: {self.old_price}')
             except NoSuchElementException:
-                print('[Scraper Warning] Old price in --> ' + self.url)
+                try:
+                    el = self.driver.find_element_by_id('buyBoxInner')
+                    self.old_price = el.find_element_by_class_name('a-text-strike').text
+                except NoSuchElementException:
+                    print('[Scraper Warning] Old price in --> ' + self.url)
 
     def __scrape_size(self):
         try:
