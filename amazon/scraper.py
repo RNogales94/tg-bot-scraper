@@ -74,9 +74,11 @@ class AmazonScraper(metaclass=Singleton):
             'size': self.size,
             'is_captcha': self.is_captcha,
         }
-        return response
 
         print('[Scraper Info] Done')
+
+        return response
+
 
     def __is_captcha(self):
         """
@@ -246,11 +248,7 @@ class AmazonScraper(metaclass=Singleton):
         except Exception as e:
             print('[ERROR Scraper Info] Exception is not being well handled in coupon scraper--> \n' + str(e))
 
-    def is_well_scraped(self):
-        return self.fully_scraped
 
-    def has_old_price(self):
-        return self.old_price is not None
 
 
 
