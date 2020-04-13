@@ -1,7 +1,9 @@
 from flask import Flask, Response, request
 from flask_cors import CORS
-from utils.url_utils import is_amazon, expand_url, get_ASIN
+from utils.url_utils import is_amazon, expand_url, get_ASIN, is_aliexpress
 from amazon.scraper import AmazonScraper
+from aliexpress.scraper import AliexpressScraper
+
 
 import json
 
@@ -10,11 +12,10 @@ CORS(xbot_webservice)
 
 
 def is_valid_url(url):
-    return is_amazon(url)
+    return is_amazon(url) or is_aliexpress(url)
 
 
 def scrape_url(url):
-    amazon_scraper = AmazonScraper()
 
     print(url)
     if url is None:
@@ -40,16 +41,18 @@ def scrape_url(url):
             return response, status
 
     if is_valid_url(url):
+        if is_aliexpress(url):
+            scraper = AliexpressScraper()
+        else:
+            scraper = AmazonScraper()
         try:
-            data = amazon_scraper.scrape(url)
+            data = scraper.scrape(url)
             response = json.dumps(data)
             status = 200
         except Exception as e:
             response = json.dumps({'Error': f'{e}'})
             print(response)
             status = 500
-    # elif AliexpressTools.is_valid_url(url):
-    #     response, status = AliexpressTools.scrape(url)
     else:
         response = json.dumps({'Error': f'{url} is not valid Amazon/Aliexpress product URL'})
         print(response)

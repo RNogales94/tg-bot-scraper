@@ -1,18 +1,26 @@
-from bs4 import BeautifulSoup
-
+import os
 from selenium.common.exceptions import NoSuchElementException
 from scraper.selenium_web_driver import SeleniumChromeDriver
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from utils.url_utils import expand_url
 
 
 class AliexpressScraper:
-    def __init__(self, url):
-        print(f'Scrapeando {url}')
-        url = expand_url(url)
+    def __init__(self):
 
+        self.driver = SeleniumChromeDriver().driver
+        self.api_key = None  # os.environ.get('SCRAPEAPI_KEY', 'adfe255be6ddb5488a7fcef4bde677c6')
+
+        # Define Properties to scrape
+        self.__reset_scraper()
+
+    def __reset_scraper(self):
         self.fully_scraped = True
-        self.url = url
+        self.url = None
         self.title = None
         self.description = None
         self.features = None
@@ -20,86 +28,126 @@ class AliexpressScraper:
         self.size = None
         self.old_price = None
         self.price = None
+        self.coupon_code = None
+        self.coupon_discount = None
+        self.coupon_price = None
         self.image_url = None
         self.is_captcha = None
+        self.driver.delete_all_cookies()
 
-        self.driver = SeleniumChromeDriver().driver
+    def scrape(self, url):
+        self.__reset_scraper()
+        self.url = expand_url(url)
 
-        local_cookie = {'name': 'aep_usuc_f',
-                        'value': 'site=glo&province=919986676578000000&city=919986676578011000&c_tp=EUR&region=ES&b_locale=en_US'}
+        if self.api_key is None:
+            self.driver.get(self.url)
+        else:
+            url = f'http://api.scraperapi.com/?api_key={self.api_key}&url={self.url}'
+            self.driver.get(url)
 
+        print(f'###########################\n[Scraper] {self.driver.title}\n##############################')
 
-        self.driver.get(url)
-        self.driver.add_cookie({'name': local_cookie['name'],
-                                'value': local_cookie['value'],
-                                'domain': 'aliexpress.com'
-                                })
-
-        # source_html = self.driver.page_source
-        # self.soup = BeautifulSoup(source_html, "html.parser")
-
-        if self.__error_captcha():
+        if self.__is_captcha():
             self.is_captcha = True
-            self.fully_scraped = False
 
         else:
             self.is_captcha = False
-            self.title = self.__scrape_title()
-            self.price = self.__scrape_price()
-            self.price = self.__format_price(self.price)
-            self.old_price = self.__scrape_old_price()
-            self.old_price = self.__format_price(self.old_price)
-            self.image_url = self.__scrape_img_url()
+            self.__get_properties()
 
-            self.description = self.__scrape_description()
-            self.features = self.__scrape_features()
-            self.size = self.__scrape_size()
-            self.end_date = self.__scrape_end_date()
+        response = {
+            'short_description': self.title,
+            'description': self.description,
+            'features': self.features,
+            'standard_price': self.old_price,
+            'end_date': self.end_date,
+            'price': self.price,
+            'coupon_code': self.coupon_code,
+            'coupon_discount': self.coupon_discount,
+            'coupon_price': self.coupon_price,
+            'url': self.url,
+            'image_url': self.image_url,
+            'size': self.size,
+            'is_captcha': self.is_captcha,
+        }
 
-            if self.title is not None and self.price is not None and self.image_url is not None:
-                self.fully_scraped = True
+        print('[Scraper Info] Done')
+
+        return response
 
 
-    @staticmethod
-    def __error_captcha():
-        return False
+        # if self.__error_captcha():
+        #     self.is_captcha = True
+        #     self.fully_scraped = False
+        #
+        # else:
+        #     self.is_captcha = False
+        #     self.title = self.__scrape_title()
+        #     self.price = self.__scrape_price()
+        #     self.price = self.__format_price(self.price)
+        #     self.old_price = self.__scrape_old_price()
+        #     self.old_price = self.__format_price(self.old_price)
+        #     self.image_url = self.__scrape_img_url()
+        #
+        #     self.description = self.__scrape_description()
+        #     self.features = self.__scrape_features()
+        #     self.size = self.__scrape_size()
+        #     self.end_date = self.__scrape_end_date()
+        #
+        # if self.title is not None and self.price is not None and self.image_url is not None:
+        #     self.fully_scraped = True
+
+    def __is_captcha(self):
+        """
+        Boolean method, return if selenium driver arrives to Aliexpress CAPTCHA page.
+        :return: True or False
+        """
+        # todo --> change for aliexpress captcha
+        if self.driver.title in ['Amazon CAPTCHA', '503 - Service Unavailable Error']:
+            return True
+        else:
+            return False
+
+    def __get_properties(self):
+        self.__scrape_title()
+        self.__scrape_description()
+        self.__scrape_features()
+        self.__scrape_price()
+        self.__scrape_old_price()
+        self.__scrape_size()
+        self.__scrape_image_url()
+        self.__scrape_end_date()
+        self.__scrape_coupon()
 
     def __scrape_title(self):
         try:
-            title = self.driver.find_element_by_class_name('product-title').text
+            self.title = self.driver.find_element_by_class_name('product-title').text
         except NoSuchElementException:
             try:
-                title = self.driver.find_element_by_class_name('product-name').text
+                self.title = self.driver.find_element_by_class_name('product-name').text
             except NoSuchElementException:
                 print('[Scraper Error] Title in --> ' + self.url)
-                title = None
-
-        return title
+                self.title = None
 
     def __scrape_price(self):
         try:
-            price = self.driver.find_element_by_class_name('product-price-current').find_element_by_class_name('product-price-value').text
+            self.price = self.driver.find_element_by_class_name('product-price-current').find_element_by_class_name('product-price-value').text
         except NoSuchElementException:
             try:
-                price = self.driver.find_element_by_class_name('p-price-content').text
+                self.price = self.driver.find_element_by_class_name('p-price-content').text
             except NoSuchElementException:
                 print('[Scraper Error] Price in --> ' + self.url)
-                price = None
-
-        return price
+                self.price = None
 
     def __scrape_old_price(self):
         try:
-            old_price = self.driver.find_element_by_class_name('product-price-original').find_element_by_class_name('product-price-value').text
+            self.old_price = self.driver.find_element_by_class_name('product-price-original').find_element_by_class_name('product-price-value').text
         except NoSuchElementException:
             try:
-                old_price = self.driver.find_element_by_class_name('p-del-price-content').text
+                self.old_price = self.driver.find_element_by_class_name('p-del-price-content').text
 
             except NoSuchElementException:
                 print('[Scraper Error] Old Price in --> ' + self.url)
-                old_price = None
-
-        return old_price
+                self.old_price = None
 
     @staticmethod
     def __format_price(price):
@@ -129,36 +177,20 @@ class AliexpressScraper:
     def __scrape_end_date(self):
         return None
 
-    def __scrape_img_url(self):
+    def __scrape_image_url(self):
         try:
+            # father = WebDriverWait(self.driver, 1).until(EC.presence_of_element_located((By.CLASS_NAME, 'image-viewer')))
+
             father = self.driver.find_element_by_class_name('image-viewer')
-            img_url = father.find_element_by_class_name('magnifier-image').get_attribute('src')
+            self.image_url = father.find_element_by_class_name('magnifier-image').get_attribute('src')
         except NoSuchElementException:
             try:
                 father = self.driver.find_element_by_class_name('ui-image-viewer')
-                img_url = father.find_element_by_tag_name('img').get_attribute('src')
+                self.image_url = father.find_element_by_tag_name('img').get_attribute('src')
             except NoSuchElementException:
-                img_url = None
-        return img_url
+                self.image_url = None
 
-    def is_well_scraped(self):
-        return self.fully_scraped
-
-    def has_old_price(self):
-        return self.old_price is not None
-
-    def to_dict(self):
-        response = {
-                'short_description': self.title,
-                'description': self.description,
-                'features': self.features,
-                'standard_price': self.old_price,
-                'end_date': self.end_date,
-                'price': self.price,
-                'url': self.url,
-                'image_url': self.image_url,
-                'size': self.size
-             }
-        return response
+    def __scrape_coupon(self):
+        return None
 
 
