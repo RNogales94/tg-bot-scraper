@@ -13,7 +13,7 @@ class AliexpressScraper:
     def __init__(self):
 
         self.driver = SeleniumChromeDriver().driver
-        self.api_key = None  # os.environ.get('SCRAPEAPI_KEY', 'adfe255be6ddb5488a7fcef4bde677c6')
+        self.api_key = os.environ.get('SCRAPEAPI_KEY', 'adfe255be6ddb5488a7fcef4bde677c6')
 
         # Define Properties to scrape
         self.__reset_scraper()
